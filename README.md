@@ -14,7 +14,7 @@ This is a command-line application created using Node.js, Inquirer, and MySQL. T
 ## Screen Recording
 
 ![SVG logo generator walkthrough gif](./gif/walkthrough.gif)
-[![Youtube Link](https://youtu.be/7X52M-Ct6hs)]
+![Youtube Link](https://youtu.be/7X52M-Ct6hs)
 
 
 ## Built With:
