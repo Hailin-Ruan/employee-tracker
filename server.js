@@ -12,12 +12,10 @@ app.use(express.json());
 const db = mysql.createConnection(
     {
         host: "localhost",
-        user: DB_USER,
-        password: DB_PASSWORD,
+        user: "root",
+        password: "asdfghjkl;'",
         database: "employee_db"
-    },
-    console.log(`Connected to the employee_db database.`)
-);
+    });
 
 db.connect((err) => {
     if (err) {
@@ -25,6 +23,7 @@ db.connect((err) => {
         return;
     }
     console.log('Connected to the database');
+    promptForAction();
 });
 
 // GET /departments
@@ -40,7 +39,7 @@ app.get('/departments', (req, res) => {
     });
 });
 
-//other endpoints
+//can add other endpoints
 
 function promptForAction() {
     inquirer
@@ -109,7 +108,7 @@ function handleAction(action) {
 
         case 'View all employees':
             const selectEmployeesQuery = `
-            SELECT employees.employee_id, employees.first_name, employees.last_name, roles.job_title, roles.salary, deaprtments.department_name
+            SELECT employees.employee_id, employees.first_name, employees.last_name, roles.job_title, roles.salary, departments.department_name
             FROM employees
             INNER JOIN roles ON employees.role_id = roles.role_id
             INNER JOIN departments ON roles.department_id = departments. department_id
@@ -155,12 +154,120 @@ function handleAction(action) {
             break;
 
         case 'Add a role':
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'jobTitle',
+                    message: 'Enter the job title:',
+                },
+                {
+                    type: 'input',
+                    name: 'salary',
+                    message: 'Enter the salary:',
+                },
+                {
+                    type: 'input',
+                    name: 'departmentId',
+                    message: 'Enter the department ID:',
+                },
+            ])
+                .then((answers) => {
+                    const jobTitle = answers.jobTitle;
+                    const salary = parseFloat(answers.salary);
+                    const departmentId = parseInt(answers.departmentId);
+
+                    const insertRoQuery = 'INSERT INTO roles (job_title, salary, department_id) VALUES (?, ?, ?)';
+                    db.query(insertRoQuery, [jobTitle, salary, departmentId], (err, result) => {
+                        if (err) {
+                            console.error('Error inserting role:', err);
+                        } else {
+                            console.log('Role added successfully.');
+                        }
+                        promptForAction();
+                    });;
+                })
+                .catch((error) => {
+                    console.error('An error occurred:', err);
+                    promptForAction();
+                });
             break;
 
         case 'Add an employee':
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'firstName',
+                    message: 'Enter the first name:',
+                },
+                {
+                    type: 'input',
+                    name: 'lastName',
+                    message: 'Enter the last name:',
+                },
+                {
+                    type: 'input',
+                    name: 'roleId',
+                    message: 'Enter the role ID:',
+                },
+                {
+                    type: 'input',
+                    name: 'managerId',
+                    message: 'Enter the manager ID (or leave empty if none):',
+                },
+            ])
+                .then((answers) => {
+                    const firstName = answers.firstName;
+                    const lastName = answers.lastName;
+                    const roleId = parseInt(answers.roleId);
+                    const managerId = answers.managerId !== '' ? parseInt(answers.managerId) : null;
+
+                    const insertEmQuery = 'INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)';
+                    db.query(insertEmQuery, [firstName, lastName, roleId, managerId], (err, result) => {
+                        if (err) {
+                            console.error('Error inserting employee:', err);
+                        } else {
+                            console.log('Employee added successfully.');
+                        }
+                        promptForAction();
+                    });
+                })
+                .catch((error) => {
+                    console.error('An error occurred:', error);
+                    promptForAction();
+                });
             break;
 
         case 'Update an employee role':
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'employeeId',
+                    message: 'Enter the employee ID:',
+                },
+                {
+                    type: 'input',
+                    name: 'newRoleId',
+                    message: 'Enter the new role ID:',
+                },
+            ])
+            .then((answers) => {
+                const employeeId = parseInt(answers. employeeId);
+                const newRoleId = parseInt(answers.newRoleId);
+
+                const updateQuery = 'UPDATE employees SET role_id = ? WHERE employee_id = ?';
+                db.query(updateQuery, [newRoleId, employeeId], (err, result) => {
+                    if (err) {
+                        console.error('Error updating employee role:', err);
+                    } else {
+                        console.log('Employee role updated successfully.');
+                    }
+                    promptForAction();
+                });
+            })
+            .catch((error) => {
+                console.error('An error occurred:', error);
+                promptForAction();
+            });
             break;
 
         case 'Exit':
