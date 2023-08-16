@@ -13,8 +13,8 @@ This is a command-line application created using Node.js, Inquirer, and MySQL. T
 
 ## Screen Recording
 
-![SVG logo generator walkthrough gif](./gif/walkthrough.gif)
-![Youtube Link](https://youtu.be/7X52M-Ct6hs)
+![SVG logo generator walkthrough gif](./assets/employee-tracker.gif)
+[![Youtube Link](https://img.youtube.com/vi/abc123/0.jpg)](https://youtu.be/7X52M-Ct6hs)
 
 
 ## Built With:
